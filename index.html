@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
+        integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
+
+<body>
+    <div>
+        <section>
+            <div id="user-details">
+                <h1>Sudoku-Game</h1>
+                <label for="player">Enter Player Name:</label>
+                <input type="text" id="player">
+                <br>
+                <button onclick="startGame(40)">Start Game</button>
+            </div>
+            <div id="score-board">
+                <h3> Score board</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>No.</th>
+                            <th>Player</th>
+                            <th>Timing</th>
+                        </tr>
+                    </thead>
+                    <tbody id="scoreTable">
+                    </tbody>
+                </table>
+            </div>
+        </section>
+        <section id="game">
+            <div id="options">
+                <div>
+                    <h3>
+                        Time:-
+                        <span id="time"><span id="minute">00</span>:<span id="second">00</span></span>
+                    </h3>
+                </div>
+                <div>
+                    <h3>Mistakes:<span id="mistake">0</span>/3</h3>
+                </div>
+                <div>
+                    <button onclick="erase()"><i class="fa-solid fa-eraser"></i></button>
+                    <button onclick="undo()"> <i class="fa-solid fa-rotate-left"></i></button>
+                </div>
+            </div>
+            <div id="level">
+                <button onclick="levelChange(40, this)" id="easy">Easy</button>
+                <button onclick="levelChange(43, this)" id="medium">Medium</button>
+                <button onclick="levelChange(51, this)" id="hard">Hard</button>
+            </div>
+            <main> </main>
+            <div id="play-again">
+                <h2 id="over"></h2>
+                <button id="restart">New Game</button>
+            </div>
+        </section>
+    </div>
+    <script src="script.js"></script>
+</body>
+
+</html>
