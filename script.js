@@ -16,9 +16,9 @@ let box = [];
 let key = 0;
 let number = 1;
 let fnCall = 0;
-let second = 0;
-let minute = 0;
-let incorrect = 0;
+let second = 0 | JSON.parse(localStorage.getItem("second"));
+let minute = 0 | JSON.parse(localStorage.getItem("minute"));
+let incorrect = 0 | JSON.parse(localStorage.getItem("mistake"));
 let boxClickable = false;
 let timeInterval;
 let currentLevel = level.children[0];
@@ -92,6 +92,7 @@ let scoreBoard = {
         }
     ]
 };
+let exitBox = [];
 
 
 
@@ -140,6 +141,8 @@ const timeStart = () => {
         second = 0;
     }
     document.querySelector("#minute").textContent = minute < 10 ? `${"0" + minute}` : minute;
+    localStorage.setItem("minute", JSON.stringify(minute));
+    localStorage.setItem("second", JSON.stringify(second));
 };
 
 
@@ -228,12 +231,14 @@ const removeRandomBox = (blank) => {
 
 
 const visibleBoxDisable = () => {
-    box?.forEach(x => {
+    box?.forEach((x, i) => {
         if (x.value) {
             x.setAttribute("readonly", true);
             x.style.color = "gray";
+            exitBox.push({ id: i + 1, val: x.value });
         };
     });
+    localStorage.setItem("exitBox", JSON.stringify(exitBox));
 };
 
 
@@ -256,6 +261,7 @@ const checkNumber = (e) => {
         };
         document.querySelector("#mistake").textContent = incorrect;
         filledBox = [...filledBox, { id: e.id, val: e.value }];
+        localStorage.setItem("mistake", JSON.parse(incorrect));
     }
     else {
         e.value = "";
@@ -393,3 +399,22 @@ const showScore = (level) => {
     document.querySelector("#scoreTable").innerHTML = str;
 };
 
+
+
+if (isPlayer) {
+    boxClickable = true;
+    for (let x of JSON.parse(localStorage.getItem("exitBox"))) {
+        document.getElementById(`${x.id}`).value = x.val;
+        document.getElementById(`${x.id}`).setAttribute("readonly", true);
+        document.getElementById(`${x.id}`).style.color = "gray";
+    }
+    fixBoxVal = JSON.parse(localStorage.getItem("fixBoxVal"))
+    showScore(currentLevel);
+    clearInterval(timeInterval);
+    currentLevel.style.backgroundColor = '#1C76D0';
+    timeInterval = setInterval(timeStart, 1000);
+    document.querySelector("#score-board").style.display = "block";
+    document.querySelector("#mistake").textContent = incorrect;
+    document.querySelector("#second").textContent = second < 10 ? `${"0" + second}` : second;
+    document.querySelector("#minute").textContent = minute < 10 ? `${"0" + minute}` : minute;
+}
