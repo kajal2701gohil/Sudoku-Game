@@ -16,16 +16,17 @@ let box = [];
 let key = 0;
 let number = 1;
 let fnCall = 0;
-let second = 0 | JSON.parse(localStorage.getItem("second"));
-let minute = 0 | JSON.parse(localStorage.getItem("minute"));
-let incorrect = 0 | JSON.parse(localStorage.getItem("mistake"));
+let second = 0;
+let minute = 0;
+let incorrect = 0;
 let boxClickable = false;
 let timeInterval;
 let currentLevel = level.children[0];
 let currentBox;
-let filledBox = [];
+let filledBox = JSON.parse(localStorage.getItem("filledBox")) || [];
 let listing = [];
 let isPlayer = false || JSON.parse(localStorage.getItem("isPlayer"));
+let exitBox = [];
 let scoreBoard = {
     easy: [{
         player: "Emily",
@@ -92,8 +93,6 @@ let scoreBoard = {
         }
     ]
 };
-let exitBox = [];
-
 
 
 const displayBoxes = () => {
@@ -113,8 +112,11 @@ displayBoxes();
 const startGame = (blank) => {
     const player = document.getElementById("player");
     if (player.value || isPlayer) {
+        exitBox = [];
         isPlayer = true;
         localStorage.setItem("isPlayer", isPlayer);
+        filledBox = [];
+        localStorage.setItem("filledBox", JSON.stringify(filledBox));
         currentLevel.style.backgroundColor = '#1C76D0';
         document.querySelector("#score-board").style.display = "block";
         clearInterval(timeInterval);
@@ -135,14 +137,14 @@ const startGame = (blank) => {
 
 const timeStart = () => {
     second++;
-    document.querySelector("#second").textContent = second < 10 ? `${"0" + second}` : second;
     if (second > 60) {
         minute++;
         second = 0;
     }
-    document.querySelector("#minute").textContent = minute < 10 ? `${"0" + minute}` : minute;
-    localStorage.setItem("minute", JSON.stringify(minute));
-    localStorage.setItem("second", JSON.stringify(second));
+    document.querySelector("#second").textContent = (second.toString().length < 2) ? `${"0" + second}` : second;
+    document.querySelector("#minute").textContent = (minute.toString().length < 2) ? `${"0" + minute}` : minute;
+    let timeStop = document.getElementById("time").textContent;
+    localStorage.setItem("timeStop", JSON.stringify(timeStop));
 };
 
 
@@ -163,7 +165,6 @@ const fillBox = (number) => {
             let target = document.getElementById(arr[i][random]);
             conflict = false;
             target.value = number;
-
             let row = target.parentElement.children;
             let column = document.querySelectorAll(`.${target.getAttribute("class").split(" ")[1]}`);
             for (let x of row) {
@@ -252,6 +253,7 @@ const checkNumber = (e) => {
         if (!hasCorrect) {
             e.style.color = "red";
             incorrect++;
+            localStorage.setItem("mistake", JSON.parse(incorrect));
         };
         if (incorrect >= 3) {
             document.querySelector("#over").textContent = "Game Over!"
@@ -260,12 +262,13 @@ const checkNumber = (e) => {
             clearInterval(timeInterval);
         };
         document.querySelector("#mistake").textContent = incorrect;
-        filledBox = [...filledBox, { id: e.id, val: e.value }];
-        localStorage.setItem("mistake", JSON.parse(incorrect));
+        filledBox = [...filledBox, { id: e.id, val: e.value, type: e.style.color }];
+        localStorage.setItem("filledBox", JSON.stringify(filledBox));
     }
     else {
         e.value = "";
     };
+
     let emptyBox = 0;
     for (let x of box) {
         if (x.value === "") {
@@ -328,10 +331,12 @@ const levelChange = (a, e) => {
         x.style.backgroundColor = "#777070";
     };
     currentLevel = e;
+    localStorage.setItem("level", JSON.stringify(currentLevel.id))
     document.querySelector("#mistake").textContent = incorrect;
     document.querySelector("#over").textContent = "";
     document.querySelector("#restart").style.display = "none";
     second = 0;
+    minute = 0
     displayBoxes();
     fixBoxVal = [];
     startGame(a);
@@ -400,21 +405,32 @@ const showScore = (level) => {
 };
 
 
-
 if (isPlayer) {
     boxClickable = true;
-    for (let x of JSON.parse(localStorage.getItem("exitBox"))) {
+    clearInterval(timeInterval);
+    incorrect = JSON.parse(localStorage.getItem("mistake")) || 0;
+    fixBoxVal = JSON.parse(localStorage.getItem("fixBoxVal"));
+    exitBox = JSON.parse(localStorage.getItem("exitBox"));
+    for (let x of exitBox) {
         document.getElementById(`${x.id}`).value = x.val;
         document.getElementById(`${x.id}`).setAttribute("readonly", true);
         document.getElementById(`${x.id}`).style.color = "gray";
     }
-    fixBoxVal = JSON.parse(localStorage.getItem("fixBoxVal"))
+    for (let x of level.children) {
+        if (x.id == JSON.parse(localStorage.getItem("level"))) {
+            currentLevel = x;
+        }
+    }
+    focusEffect(box[0]);
     showScore(currentLevel);
-    clearInterval(timeInterval);
     currentLevel.style.backgroundColor = '#1C76D0';
     timeInterval = setInterval(timeStart, 1000);
     document.querySelector("#score-board").style.display = "block";
     document.querySelector("#mistake").textContent = incorrect;
-    document.querySelector("#second").textContent = second < 10 ? `${"0" + second}` : second;
-    document.querySelector("#minute").textContent = minute < 10 ? `${"0" + minute}` : minute;
+    for (let y of filledBox) {
+        document.getElementById(`${y.id}`).value = y.val;
+        document.getElementById(`${y.id}`).style.color = y.type;
+    }
+    second = JSON.parse(localStorage.getItem("timeStop")).split(":")[1];
+    minute = JSON.parse(localStorage.getItem("timeStop")).split(":")[0];
 }
